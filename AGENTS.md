@@ -140,8 +140,7 @@ is on content, not design.
 ## Current State / Roadmap
 
 - M1 done: AGENTS.md, deps, theme, 3-tab shell (Dashboard / Block Apps /
-  Settings).
-- M2 done: content models + JSON library (50 Quran, 51 Hadith, Arabic +
+  Settings).- M2 done: content models + JSON library (50 Quran, 51 Hadith, Arabic +
   English, NOT yet reviewed religiously by user), settings screen (display
   mode, content style, session duration), reading card + preview on dashboard.
 - M3 done: Android side complete but NOT yet compiled (no Java/SDK on dev
@@ -202,6 +201,41 @@ is on content, not design.
   verified identical to Flutter 3.47.2 template (FlutterImplicitEngineDelegate
   API correct). GH Actions workflow added; everything pushed (bc213b3), CI
   loop pending user: repo public + `gh auth login`.
+- M8.6 done (Sep 5, 2026): **iOS CI GREEN** (`build-ios` passing; first
+  compile ever). Fix loop learnings, in order:
+  1. Flutter 3.47 enables SwiftPM **by default on stable** — the
+     `SwiftPackageManagerIntegrationMigration` is hardcoded to the Flutter
+     template's fixed UUIDs (Runner target `97C146ED1CF9000F007C117D`,
+     frameworks phase `97C146EB1...`; scheme must reference them) and is
+     FATAL on xcodegen projects ("Could not find BuildableReference for
+     Runner"). Removed the `flutter config --enable-swift-package-manager`
+     step — irrelevant — and disabled per-project in pubspec:
+     `flutter: config: enable-swift-package-manager: false` (project config
+     beats default; covers CI/local/codemagic). With SPM off, the tool uses
+     the CocoaPods path: added `ios/Podfile` (template minus RunnerTests
+     block; platform 16.0), tool auto-injects `#include? "Pods/Target
+     Support Files/..."` into Flutter/Debug/Release.xcconfig before pod
+     install (cocoapods.dart addPodsDependencyToFlutterXcconfig), Runner
+     target got target-level configFiles (base config) so the pods xcconfig
+     chains; extensions rely on project-level configFiles for
+     FLUTTER_BUILD_*.
+  2. project.yml: removed `packages:`/ephemeral SwiftPM package dep;
+     deployment target bumped 15.0 → **16.0** (requestAuthorization(for:) and
+     NavigationStack are 16+; FamilyActivityPicker itself is 15+).
+  3. Extension Info.plists got full CFBundle keys (CFBundleIdentifier
+     `$(PRODUCT_BUNDLE_IDENTIFIER)`, PackageType XPC!, version from
+     FLUTTER_BUILD_NAME/NUMBER) — without them embedded-binary validation
+     fails ("bundle identifier is not prefixed with the parent app's").
+  4. Compile fixes: `shield.applicationCategories` now takes
+     `ShieldSettings.ActivityCategoryPolicy<Application>?` → use
+     `.specific(selection.categoryTokens)`; `DeviceActivityCenter
+     .startMonitoring(_:during:events:)` — `with:` label removed;
+     ShieldActionExtension needed explicit `import Foundation` (Date/
+     Calendar/TimeInterval not in scope via DeviceActivity alone).
+  5. ShieldConfigExtension compiled clean on first compile attempt.
+  Repo is public; gh CLI authenticated (ssh protocol). Unsigned build =
+  `flutter build ios --release --no-codesign` succeeds; device install still
+  needs enrollment + App IDs (Family Controls dev + App Group) + signing.
 
 ## Verification
 
