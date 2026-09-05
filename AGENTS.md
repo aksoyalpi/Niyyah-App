@@ -100,6 +100,12 @@ is on content, not design.
   `openBatterySettings` with direct dialog -> settings-list fallback). Root
   lifecycle observer in app.dart invalidates stats + permissions providers on
   resume, so dashboard/banner refresh after sessions without app restart.
+- M7 done: overlay has Previous/Next (wrap-around) to flip through the
+  sequence without confirming. ContentLibrary.sequence() returns a list
+  shuffled with a day seed (same order all day, reshuffles daily / when
+  settings change); overlay keeps its position across sessions and counts
+  each *distinct* text shown (`visited` set) — confirm reports
+  (readingSeconds, itemCount) and stats record all viewed items.
 - TODO (user/device): review religious texts before release, manual test
   protocol below.
 
@@ -120,5 +126,7 @@ is on content, not design.
 5. Tap "I've read it" after countdown → overlay closes, app usable.
 6. Stay in Instagram → after session duration (default 15 min) overlay returns.
 7. Leave Instagram before expiry → reopen → overlay immediately (session reset).
-8. Dashboard shows minutes + items from overlay sessions (re-fetches on app
+8. On the overlay: Previous/Next flip texts (wrap-around, no counter);
+   confirming after browsing records minutes + every distinct text shown.
+9. Dashboard shows minutes + items from overlay sessions (re-fetches on app
    resume, no restart needed).
