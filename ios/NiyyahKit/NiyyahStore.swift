@@ -47,7 +47,9 @@ enum NiyyahStore {
     let selection = loadSelection()
     let store = ManagedSettingsStore()
     store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
-    store.shield.applicationCategories = selection.categoryTokens.isEmpty ? nil : selection.categoryTokens
+    store.shield.applicationCategories = selection.categoryTokens.isEmpty
+      ? nil
+      : .specific(selection.categoryTokens)
   }
 
   static func clearShield() {

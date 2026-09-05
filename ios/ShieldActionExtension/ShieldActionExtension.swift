@@ -1,4 +1,5 @@
 import DeviceActivity
+import Foundation
 import ManagedSettings
 
 final class ShieldActionExtension: ShieldActionDelegate {
@@ -30,7 +31,7 @@ final class ShieldActionExtension: ShieldActionDelegate {
       repeats: false
     )
     try? DeviceActivityCenter().startMonitoring(
-      with: DeviceActivityName("niyyah.session"),
+      DeviceActivityName("niyyah.session"),
       during: schedule
     )
   }
