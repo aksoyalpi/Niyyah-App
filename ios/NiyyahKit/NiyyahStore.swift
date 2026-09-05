@@ -3,7 +3,7 @@ import FamilyControls
 import ManagedSettings
 
 enum NiyyahStore {
-  static let appGroupId = "group.com.example.niyyahApp"
+  static let appGroupId = "group.com.axoi.niyyah"
   static let selectionKey = "blocklist.selection"
   static let statsKey = "stats.daily"
   static let sessionMinutesKey = "settings.session_minutes"

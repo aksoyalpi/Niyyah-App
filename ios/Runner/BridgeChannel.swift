@@ -28,7 +28,7 @@ enum BridgeChannel {
     case "getAuthorization":
       result(["status": AuthorizationCenter.shared.authorizationStatus.rawValue])
     case "requestAuthorization":
-      Task { result(await requestAuthorization()) }
+      Task { @MainActor in result(await requestAuthorization()) }
     case "pickAppsToBlock":
       presentPicker(result)
     case "selectedAppCount":

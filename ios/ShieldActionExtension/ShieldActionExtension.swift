@@ -3,20 +3,18 @@ import ManagedSettings
 
 final class ShieldActionExtension: ShieldActionDelegate {
   override func handle(
-    _ request: ShieldActionRequest,
+    action: ShieldAction,
+    for application: ApplicationToken,
     completionHandler: @escaping (ShieldActionResponse) -> Void
   ) {
+    guard action == .primaryButtonPressed else {
+      completionHandler(.close)
+      return
+    }
     let seconds = NiyyahStore.readingSecondsSinceShown() ?? 0
     NiyyahStore.addReading(seconds: seconds)
     NiyyahStore.startSession()
     scheduleSessionEnd()
-    completionHandler(.close)
-  }
-
-  override func buttonPressed(
-    _ request: ShieldActionRequest,
-    completionHandler: @escaping (ShieldActionResponse) -> Void
-  ) {
     completionHandler(.close)
   }
 

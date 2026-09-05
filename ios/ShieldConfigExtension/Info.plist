@@ -5,14 +5,9 @@
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.ManagedSettingsUI.shield-configuration-extension</string>
+		<string>com.apple.ManagedSettingsUI.shield-configuration-service</string>
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).ShieldConfigurationExtension</string>
 	</dict>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Amiri-Regular.ttf</string>
-		<string>Amiri-Bold.ttf</string>
-	</array>
 </dict>
 </plist>

@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  build-ios:
+    runs-on: macos-15
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+      - run: flutter pub get
+      - name: Generate Xcode project
+        run: brew install xcodegen
+      - run: xcodegen generate
+        working-directory: ios
+      - name: Build iOS unsigned
+        run: flutter build ios --release --no-codesign

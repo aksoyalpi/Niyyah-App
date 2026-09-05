@@ -1,60 +1,54 @@
 import ManagedSettings
 import ManagedSettingsUI
-import SwiftUI
 import UIKit
 
 final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
+  override func configuration(shielding application: Application) -> ShieldConfiguration {
+    configuration()
+  }
+
   override func configuration(
     shielding application: Application,
-    context: Context
+    in category: ActivityCategory
   ) -> ShieldConfiguration {
+    configuration()
+  }
+
+  override func configuration(shielding webDomain: WebDomain) -> ShieldConfiguration {
     configuration()
   }
 
   override func configuration(
     shielding webDomain: WebDomain,
-    context: Context
-  ) -> ShieldConfiguration {
-    configuration()
-  }
-
-  override func configuration(
-    shielding application: Application,
-    webDomain: WebDomain?,
-    context: Context
+    in category: ActivityCategory
   ) -> ShieldConfiguration {
     configuration()
   }
 
   private func configuration() -> ShieldConfiguration {
     NiyyahStore.recordShieldShown()
-    let item = ShieldContent.todayItem()
-    let title: String
-    let subtitle: String
-    if let item {
-      title = item.source
+    let ink = UIColor(red: 0.129, green: 0.122, blue: 0.110, alpha: 1)
+    let title: ShieldConfiguration.Label
+    let subtitle: ShieldConfiguration.Label
+    if let item = ShieldContent.todayItem() {
+      title = ShieldConfiguration.Label(text: item.source, color: ink)
       switch ShieldContent.style() {
       case "arabicOnly":
-        subtitle = item.arabic
+        subtitle = ShieldConfiguration.Label(text: item.arabic, color: ink)
       case "englishOnly":
-        subtitle = item.translationEn
+        subtitle = ShieldConfiguration.Label(text: item.translationEn, color: ink)
       default:
-        subtitle = item.arabic + "\n\n" + item.translationEn
+        subtitle = ShieldConfiguration.Label(text: item.arabic + "\n\n" + item.translationEn, color: ink)
       }
     } else {
-      title = "Niyyah"
-      subtitle = "Take a moment before continuing."
+      title = ShieldConfiguration.Label(text: "Niyyah", color: ink)
+      subtitle = ShieldConfiguration.Label(text: "Take a moment before continuing.", color: ink)
     }
     return ShieldConfiguration(
-      background: .color(UIColor(red: 0.988, green: 0.984, blue: 0.969, alpha: 1)),
+      backgroundColor: UIColor(red: 0.988, green: 0.984, blue: 0.969, alpha: 1),
       title: title,
-      titleColor: UIColor(red: 0.129, green: 0.122, blue: 0.110, alpha: 1),
-      titleFont: Font.system(size: 17, weight: .semibold),
       subtitle: subtitle,
-      subtitleColor: UIColor(red: 0.129, green: 0.122, blue: 0.110, alpha: 1),
-      subtitleFont: Font.custom("Amiri", size: 24),
-      primaryButtonLabel: "I've read it",
-      primaryButtonLabelColor: .white,
+      primaryButtonLabel: ShieldConfiguration.Label(text: "I've read it", color: .white),
       primaryButtonBackgroundColor: UIColor(red: 0.184, green: 0.420, blue: 0.310, alpha: 1)
     )
   }
