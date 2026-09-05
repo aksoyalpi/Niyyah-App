@@ -7,9 +7,8 @@ is on content, not design.
 ## Product Decisions (confirmed with user, Sep 2026)
 
 - **Name**: Niyyah (package `niyyah_app`).
-- **Platform order**: Android first. iOS later (requires Apple *Family Controls*
-  entitlement + Developer Account; architecture stays ready via interfaces, no
-  implementation yet).
+- **Platform order**: Android first. iOS implemented (code complete, not yet
+  compiled — needs macOS CI; see iOS sections below).
 - **Blocking mechanism (Android)**:
   - `AccessibilityService` detects foreground app via `TYPE_WINDOW_STATE_CHANGED`.
   - Overlay shown via `WindowManager` (`TYPE_APPLICATION_OVERLAY`, permission
@@ -70,6 +69,69 @@ is on content, not design.
   is e.g. `"Quran 2:286"` or `"Riyad as-Salihin 42"`. Files:
   `assets/content/quran.json`, `assets/content/hadith.json`.
 
+## iOS Implementation (written on Linux, compile pending CI)
+
+- **Blocking mechanism (iOS)**: Screen Time APIs — `FamilyControls`
+  (authorization + `FamilyActivityPicker` tokens), `ManagedSettings` (shield),
+  `DeviceActivity` (session end). No accessibility equivalent exists.
+- **Flow**: picker selection → shield applied (blocklist survives reboot).
+  Opening a blocked app renders the native shield (Quran/Hadith via
+  ShieldConfigurationExtension, which records `shield.shown_at` on each
+  render). "I've read it" (ShieldActionExtension) → stats += reading seconds
+  (cap 300) + 1 item → shield cleared = session starts → one-shot
+  DeviceActivitySchedule `niyyah.session` → `intervalDidEnd`
+  (DeviceActivityMonitorExtension) → re-apply shield.
+- **iOS deltas vs Android (accepted)**: no installed-app list (opaque tokens,
+  count only in UI); shield UI is native Swift, not Flutter; no 10s countdown
+  (confirm closes immediately); no prev/next flip; "leave early → discard
+  session" not implemented; user can revoke Screen Time permission = bypass;
+  reading time measured shield-render → confirm.
+- **Structure**: `ios/NiyyahKit/` shared sources compiled into ALL targets
+  (NiyyahStore.swift: App Group store/settings sync/stats/shield + session
+  helpers; ShieldContent.swift: bundled JSON parse + day-seeded pick;
+  Shared.entitlements) + `ios/Runner/` (AppDelegate, BridgeChannel, AppPicker)
+  + 3 extension dirs (ShieldConfigExtension, ShieldActionExtension,
+  DeviceActivityMonitorExtension) each with Info.plist (point identifiers
+  `com.apple.ManagedSettingsUI.shield-configuration-extension`,
+  `com.apple.ManagedSettings.shield-action-extension`,
+  `com.apple.deviceactivity.monitor-extension`).
+- **Channel contract** `niyyah/bridge` (iOS side, BridgeChannel.swift):
+  `getAuthorization` → `{status: Int}` (0 notDetermined/1 denied/2 approved),
+  `requestAuthorization` → re-reads status (`.individual`), `pickAppsToBlock`
+  → presents native SwiftUI picker, saves tokens, applies shield →
+  `{count: Int}`, `selectedAppCount` → `{count: Int}`, `getStats` →
+  `{days: [{date, minutes, items}]}` (last 7 days ascending), `syncSettings`.
+  Dart impls: `ios_bridge.dart` (defensive defaults) / `android_bridge.dart`;
+  platform split in `blocklist_providers.dart` + `blocklist_screen.dart`
+  (iOS = auth card + picker button, Android = list + banner).
+- **App Group**: `group.com.example.niyyahApp` (matches bundle id
+  `com.example.niyyahApp` — note camelCase, from the Flutter template).
+  Keys: `blocklist.selection` (JSON-encoded FamilyActivitySelection),
+  `stats.daily` (JSON map yyyy-MM-dd → {minutes, items}),
+  `settings.session_minutes` / `settings.display_mode` /
+  `settings.content_style` (copied from `UserDefaults.standard`
+  `flutter.*` keys on app launch + foreground/background), `shield.shown_at`,
+  `session.ends_at`. Settings values: display_mode `quranOnly|hadithOnly|mixed`,
+  content_style `arabicOnly|englishOnly|arabicWithTranslation`.
+- **Entitlements** (`NiyyahKit/Shared.entitlements`, all 4 targets):
+  `com.apple.developer.family-controls` + app group. Needs paid Apple
+  Developer Program (dev entitlement = immediate; distribution = Apple
+  approval per bundle ID, incl. each extension).
+- **Project generation**: `ios/project.yml` (XcodeGen) — Runner + 3 app-ex
+  extension targets; Flutter backend scripts (`xcode_backend.sh build` pre /
+  `embed_and_thin` post); local SwiftPM package
+  `Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage`;
+  deployment target 15.0; extension bundle IDs = app id + extension name.
+  The checked-in `Runner.xcodeproj` is the Flutter template and will be
+  OVERWRITTEN by `xcodegen generate` on CI (never edit pbxproj by hand).
+- **CI** (`codemagic.yaml`): `niyyah-checks` (linux: analyze+test) and
+  `niyyah-ios` (mac_mini_m2: analyze+test, brew install xcodegen, xcodegen
+  generate in ios/, `flutter build ios --release --no-codesign`). Signing
+  setup (App Store Connect API key) comes with Apple enrollment.
+- **Verification**: `flutter analyze` + `flutter test` on Linux; iOS compile
+  only verifiable via Codemagic `niyyah-ios`. Device testing requires
+  enrollment + real iPhone (Screen Time APIs don't run in the simulator).
+
 ## Current State / Roadmap
 
 - M1 done: AGENTS.md, deps, theme, 3-tab shell (Dashboard / Block Apps /
@@ -108,6 +170,15 @@ is on content, not design.
   (readingSeconds, itemCount) and stats record all viewed items.
 - TODO (user/device): review religious texts before release, manual test
   protocol below.
+- M8 done (Sep 5, 2026): iOS implementation written entirely on Linux — Dart
+  platform abstraction, Runner bridge (auth/picker/stats/sync), SwiftUI
+  FamilyActivityPicker, 3 Screen Time extensions, XcodeGen project spec,
+  Codemagic workflows. NOT yet compiled (needs macOS CI run) and NOT yet
+  run on device (needs Apple Developer enrollment + Family Controls dev
+  entitlement). Next: push to git + run Codemagic `niyyah-ios`; then enroll
+  and enable Family Controls (Development) + App Group on the 4 App IDs;
+  shield extension assets (content JSON + Amiri fonts) are bundled via
+  project.yml from `../assets/`.
 
 ## Verification
 

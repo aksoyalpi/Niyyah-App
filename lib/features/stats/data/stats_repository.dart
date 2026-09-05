@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../blocklist/application/blocklist_providers.dart';
 import '../../blocklist/data/native_bridge.dart';
 
 final class StatsRepository {

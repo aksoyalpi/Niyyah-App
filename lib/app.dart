@@ -49,6 +49,8 @@ class _RootShellState extends ConsumerState<RootShell>
     if (state == AppLifecycleState.resumed) {
       ref.invalidate(statsProvider);
       ref.invalidate(permissionsProvider);
+      ref.invalidate(iosAuthorizationProvider);
+      ref.invalidate(iosSelectionCountProvider);
     }
   }
 

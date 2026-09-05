@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../application/blocklist_controller.dart';
 import '../application/blocklist_providers.dart';
-import '../data/native_bridge.dart';
+import '../data/android_bridge.dart';
+import '../data/ios_bridge.dart';
 
 class BlocklistScreen extends ConsumerStatefulWidget {
   const BlocklistScreen({super.key});
@@ -18,6 +21,8 @@ class _BlocklistScreenState extends ConsumerState<BlocklistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (Platform.isIOS) return const _IosBlocklistView();
+
     final apps = ref.watch(installedAppsProvider);
     final permissions = ref.watch(permissionsProvider);
 
@@ -108,7 +113,7 @@ final class _PermissionBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bridge = ref.read(nativeBridgeProvider);
+    final bridge = ref.read(androidBridgeProvider);
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 4),
       child: Padding(
@@ -178,6 +183,103 @@ final class _PermissionRow extends StatelessWidget {
             child: const Text('Enable'),
           ),
       ],
+    );
+  }
+}
+
+final class _IosBlocklistView extends ConsumerWidget {
+  const _IosBlocklistView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(iosAuthorizationProvider);
+    final count = ref.watch(iosSelectionCountProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Block Apps')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          auth.maybeWhen(
+            data: (status) => status == IosAuthorizationStatus.approved
+                ? const SizedBox.shrink()
+                : _IosAuthCard(status: status),
+            orElse: () => const SizedBox.shrink(),
+          ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Apps to block', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${count.value ?? 0} apps and categories selected',
+                    style: const TextStyle(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'When a selected app is opened, Niyyah shows a verse or '
+                    'hadith before it can be used.',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: () async {
+                      await ref.read(iosBridgeProvider).pickAppsToBlock();
+                      ref.invalidate(iosSelectionCountProvider);
+                    },
+                    child: const Text('Choose apps'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final class _IosAuthCard extends ConsumerWidget {
+  final IosAuthorizationStatus status;
+
+  const _IosAuthCard({required this.status});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final denied = status == IosAuthorizationStatus.denied;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Screen Time access', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(
+              denied
+                  ? 'Access was denied. Re-enable it under iOS Settings > '
+                      'Screen Time, then try again.'
+                  : 'Niyyah needs Screen Time access to show a verse instead '
+                      'of blocked apps.',
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () async {
+                final result = await ref.read(iosBridgeProvider).requestAuthorization();
+                if (result == IosAuthorizationStatus.approved) {
+                  ref.invalidate(iosAuthorizationProvider);
+                  ref.invalidate(iosSelectionCountProvider);
+                }
+              },
+              child: Text(denied ? 'Try again' : 'Allow'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
