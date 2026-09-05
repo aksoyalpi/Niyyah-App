@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ScrollView
 import android.widget.TextView
 import com.example.niyyah_app.R
 import com.example.niyyah_app.content.ContentLibrary
@@ -15,11 +16,20 @@ import com.example.niyyah_app.content.ContentLibrary
 class OverlayController(
     private val context: Context,
     private val contentLibrary: ContentLibrary,
-    private val onConfirm: (readingSeconds: Int) -> Unit,
+    private val onConfirm: (readingSeconds: Int, itemCount: Int) -> Unit,
 ) {
     private var view: View? = null
     private var countdown: CountDownTimer? = null
     private var shownAtMs = 0L
+
+    private var sequence: List<ContentLibrary.Pick> = emptyList()
+    private var index = 0
+    private val visited = mutableSetOf<Int>()
+
+    private var scroll: ScrollView? = null
+    private var arabic: TextView? = null
+    private var translation: TextView? = null
+    private var source: TextView? = null
 
     val isShowing: Boolean
         get() = view != null
@@ -31,24 +41,31 @@ class OverlayController(
             context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val inflated =
             LayoutInflater.from(context).inflate(R.layout.overlay_reading, null)
-        val arabic = inflated.findViewById<TextView>(R.id.overlay_arabic)
-        val translation = inflated.findViewById<TextView>(R.id.overlay_translation)
-        val source = inflated.findViewById<TextView>(R.id.overlay_source)
+        scroll = inflated.findViewById(R.id.overlay_scroll)
+        arabic = inflated.findViewById(R.id.overlay_arabic)
+        translation = inflated.findViewById(R.id.overlay_translation)
+        source = inflated.findViewById(R.id.overlay_source)
         val button = inflated.findViewById<Button>(R.id.overlay_button)
+        val prev = inflated.findViewById<Button>(R.id.overlay_prev)
+        val next = inflated.findViewById<Button>(R.id.overlay_next)
 
-        val pick = contentLibrary.pick(displayMode, contentStyle)
-        arabic.text = pick.arabic
-        arabic.visibility = if (pick.arabic.isBlank()) View.GONE else View.VISIBLE
-        translation.text = pick.translationEn
-        translation.visibility =
-            if (pick.translationEn.isBlank()) View.GONE else View.VISIBLE
-        source.text = pick.source
+        val fresh = contentLibrary.sequence(displayMode, contentStyle)
+        if (fresh !== sequence) {
+            sequence = fresh
+            index = 0
+            visited.clear()
+        }
+        visited.add(index)
+        bindItem()
 
         button.setOnClickListener {
             val seconds = ((System.currentTimeMillis() - shownAtMs) / 1000L).toInt()
+            val items = visited.size
             dismiss()
-            onConfirm(seconds)
+            onConfirm(seconds, items)
         }
+        prev.setOnClickListener { navigate(-1) }
+        next.setOnClickListener { navigate(1) }
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -83,6 +100,24 @@ class OverlayController(
             countdown?.cancel()
             view = null
         }
+    }
+
+    private fun navigate(step: Int) {
+        if (sequence.isEmpty()) return
+        index = (index + step).mod(sequence.size)
+        visited.add(index)
+        bindItem()
+    }
+
+    private fun bindItem() {
+        val pick = sequence.getOrNull(index) ?: ContentLibrary.Pick("", "", "")
+        arabic?.text = pick.arabic
+        arabic?.visibility = if (pick.arabic.isBlank()) View.GONE else View.VISIBLE
+        translation?.text = pick.translationEn
+        translation?.visibility =
+            if (pick.translationEn.isBlank()) View.GONE else View.VISIBLE
+        source?.text = pick.source
+        scroll?.scrollTo(0, 0)
     }
 
     fun dismiss() {

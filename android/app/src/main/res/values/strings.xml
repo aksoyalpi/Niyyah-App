@@ -3,4 +3,6 @@
     <string name="blocker_service_description">Detects when a blocked app is opened so Niyyah can show a Quran verse or Hadith overlay.</string>
     <string name="overlay_read_it">I\'ve read it</string>
     <string name="overlay_read_it_in">I\'ve read it (%1$d s)</string>
+    <string name="overlay_previous">Previous</string>
+    <string name="overlay_next">Next</string>
 </resources>

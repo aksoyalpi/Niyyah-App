@@ -71,9 +71,9 @@ class BlockerService : AccessibilityService() {
         overlay.show(settings.displayMode, settings.contentStyle)
     }
 
-    private fun onOverlayConfirmed(readingSeconds: Int) {
+    private fun onOverlayConfirmed(readingSeconds: Int, itemCount: Int) {
         val capped = readingSeconds.coerceAtMost(OverlayController.MAX_READ_SECONDS)
-        if (capped > 0) stats.record(capped, 1)
+        if (capped > 0 || itemCount > 0) stats.record(capped, itemCount)
         sessionPackage = foregroundPackage
         handler.postDelayed(sessionExpiryRunnable, settings.sessionMinutes * 60_000L)
     }

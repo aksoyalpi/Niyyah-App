@@ -2,6 +2,7 @@ package com.example.niyyah_app.content
 
 import android.content.Context
 import org.json.JSONArray
+import java.time.LocalDate
 import kotlin.random.Random
 
 class ContentLibrary(private val context: Context) {
@@ -9,31 +10,43 @@ class ContentLibrary(private val context: Context) {
     data class Pick(val arabic: String, val translationEn: String, val source: String)
 
     private val cache = mutableMapOf<String, JSONArray>()
+    private val sequences = mutableMapOf<String, List<Pick>>()
 
     @Synchronized
-    fun pick(displayMode: String, contentStyle: String): Pick {
-        val quran = load("quran.json")
-        val hadith = load("hadith.json")
-        val pool = when (displayMode) {
-            "quranOnly" -> quran
-            "hadithOnly" -> hadith
-            else ->
-                if (Random.nextBoolean()) quran.ifEmpty(hadith) else hadith.ifEmpty(quran)
+    fun sequence(displayMode: String, contentStyle: String): List<Pick> {
+        val day = LocalDate.now().toEpochDay()
+        val key = "$day|$displayMode|$contentStyle"
+        sequences[key]?.let { return it }
+        sequences.keys.retainAll { it.startsWith("$day|") }
+        val pools = when (displayMode) {
+            "quranOnly" -> listOf(load("quran.json"))
+            "hadithOnly" -> listOf(load("hadith.json"))
+            else -> listOf(load("quran.json"), load("hadith.json"))
         }
-        if (pool.length() == 0) return Pick("", "", "")
-        val entry = pool.getJSONObject(Random.nextInt(pool.length()))
-        val arabic = entry.optString("arabic")
-        val translation = entry.optString("translationEn")
-        val source = entry.optString("source")
-        return when (contentStyle) {
-            "arabicOnly" -> Pick(arabic, "", source)
-            "englishOnly" -> Pick("", translation, source)
-            else -> Pick(arabic, translation, source)
+        val raw = mutableListOf<Triple<String, String, String>>()
+        for (pool in pools) {
+            for (i in 0 until pool.length()) {
+                val entry = pool.getJSONObject(i)
+                raw.add(
+                    Triple(
+                        entry.optString("arabic"),
+                        entry.optString("translationEn"),
+                        entry.optString("source"),
+                    ),
+                )
+            }
         }
+        raw.shuffle(Random(day))
+        val list = raw.map { (arabic, translation, source) ->
+            when (contentStyle) {
+                "arabicOnly" -> Pick(arabic, "", source)
+                "englishOnly" -> Pick("", translation, source)
+                else -> Pick(arabic, translation, source)
+            }
+        }
+        sequences[key] = list
+        return list
     }
-
-    private fun JSONArray.ifEmpty(fallback: JSONArray): JSONArray =
-        if (length() == 0) fallback else this
 
     private fun load(name: String): JSONArray {
         cache[name]?.let { return it }

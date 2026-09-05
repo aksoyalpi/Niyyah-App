@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FCFBF7"
@@ -50,6 +51,36 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/overlay_prev"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/overlay_previous"
+                android:textColor="#2F6B4F"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/overlay_next"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/overlay_next"
+                android:textColor="#2F6B4F"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/overlay_button"
