@@ -12,9 +12,6 @@ configFiles:
   Debug: Flutter/Debug.xcconfig
   Release: Flutter/Release.xcconfig
   Profile: Flutter/Release.xcconfig
-packages:
-  FlutterGeneratedPluginSwiftPackage:
-    path: Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage
 settings:
   base:
     SWIFT_VERSION: "5.0"
@@ -47,10 +44,13 @@ targets:
           - $(inherited)
           - "@executable_path/Frameworks"
         SWIFT_OBJC_BRIDGING_HEADER: Runner/Runner-Bridging-Header.h
+    configFiles:
+      Debug: Flutter/Debug.xcconfig
+      Release: Flutter/Release.xcconfig
+      Profile: Flutter/Release.xcconfig
     entitlements:
       path: NiyyahKit/Shared.entitlements
     dependencies:
-      - package: FlutterGeneratedPluginSwiftPackage
       - target: ShieldConfigExtension
       - target: ShieldActionExtension
       - target: DeviceActivityMonitorExtension
