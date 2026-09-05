@@ -91,9 +91,10 @@ is on content, not design.
   helpers; ShieldContent.swift: bundled JSON parse + day-seeded pick;
   Shared.entitlements) + `ios/Runner/` (AppDelegate, BridgeChannel, AppPicker)
   + 3 extension dirs (ShieldConfigExtension, ShieldActionExtension,
-  DeviceActivityMonitorExtension) each with Info.plist (point identifiers
-  `com.apple.ManagedSettingsUI.shield-configuration-extension`,
-  `com.apple.ManagedSettings.shield-action-extension`,
+  DeviceActivityMonitorExtension) each with Info.plist (point identifiers —
+  NOTE the inconsistent suffixes, verified against iOS 26-era sources:
+  `com.apple.ManagedSettingsUI.shield-configuration-service`,
+  `com.apple.ManagedSettings.shield-action-service`,
   `com.apple.deviceactivity.monitor-extension`).
 - **Channel contract** `niyyah/bridge` (iOS side, BridgeChannel.swift):
   `getAuthorization` → `{status: Int}` (0 notDetermined/1 denied/2 approved),
@@ -104,8 +105,8 @@ is on content, not design.
   Dart impls: `ios_bridge.dart` (defensive defaults) / `android_bridge.dart`;
   platform split in `blocklist_providers.dart` + `blocklist_screen.dart`
   (iOS = auth card + picker button, Android = list + banner).
-- **App Group**: `group.com.example.niyyahApp` (matches bundle id
-  `com.example.niyyahApp` — note camelCase, from the Flutter template).
+- **App Group**: `group.com.axoi.niyyah` (matches bundle id `com.axoi.niyyah`;
+  renamed from template `com.example.niyyahApp` before App ID registration).
   Keys: `blocklist.selection` (JSON-encoded FamilyActivitySelection),
   `stats.daily` (JSON map yyyy-MM-dd → {minutes, items}),
   `settings.session_minutes` / `settings.display_mode` /
@@ -124,12 +125,16 @@ is on content, not design.
   deployment target 15.0; extension bundle IDs = app id + extension name.
   The checked-in `Runner.xcodeproj` is the Flutter template and will be
   OVERWRITTEN by `xcodegen generate` on CI (never edit pbxproj by hand).
-- **CI** (`codemagic.yaml`): `niyyah-checks` (linux: analyze+test) and
-  `niyyah-ios` (mac_mini_m2: analyze+test, brew install xcodegen, xcodegen
-  generate in ios/, `flutter build ios --release --no-codesign`). Signing
-  setup (App Store Connect API key) comes with Apple enrollment.
+- **CI**: primary = GitHub Actions `.github/workflows/ios.yml` (repo public):
+  `checks` (ubuntu, Flutter 3.47.2, analyze+test) → `build-ios` (macos-15,
+  `needs: checks`, `flutter config --enable-swift-package-manager` — REQUIRED,
+  SPM is off by default and there is no Podfile; `brew install xcodegen`,
+  `xcodegen generate` in ios/, `flutter build ios --release --no-codesign`).
+  `codemagic.yaml` kept as fallback (Codemagic account never created). Signing
+  setup (App Store Connect API key or p12/profile secrets) comes with Apple
+  enrollment.
 - **Verification**: `flutter analyze` + `flutter test` on Linux; iOS compile
-  only verifiable via Codemagic `niyyah-ios`. Device testing requires
+  only verifiable via GitHub Actions `build-ios`. Device testing requires
   enrollment + real iPhone (Screen Time APIs don't run in the simulator).
 
 ## Current State / Roadmap
@@ -175,10 +180,28 @@ is on content, not design.
   FamilyActivityPicker, 3 Screen Time extensions, XcodeGen project spec,
   Codemagic workflows. NOT yet compiled (needs macOS CI run) and NOT yet
   run on device (needs Apple Developer enrollment + Family Controls dev
-  entitlement). Next: push to git + run Codemagic `niyyah-ios`; then enroll
-  and enable Family Controls (Development) + App Group on the 4 App IDs;
-  shield extension assets (content JSON + Amiri fonts) are bundled via
-  project.yml from `../assets/`.
+  entitlement). Next: push to git + run CI; then enroll and enable Family
+  Controls (Development) + App Group on the 4 App IDs; shield extension
+  assets (content JSON) are bundled via project.yml from `../assets/`.
+- M8.5 done (Sep 5, 2026): pre-compile fix pass after verifying APIs against
+  iOS 26-era docs — the Screen Time APIs CHANGED since the code was written:
+  `ShieldConfigurationDataSource` now has 4 overloads `configuration(shielding:)
+  ` / `configuration(shielding:in:)` (ActivityCategory; no `context:` param,
+  no (app, webDomain) combo); `ShieldConfiguration` init is
+  `backgroundBlurStyle:backgroundColor:icon:title:subtitle:primaryButtonLabel:
+  primaryButtonBackgroundColor:secondaryButtonLabel:` where labels are
+  `ShieldConfiguration.Label` with ONLY `init(text:color:)` (no font param —
+  Amiri cannot be used in shield labels, system font only; Amiri bundling +
+  UIAppFonts removed from shield extension); `ShieldActionDelegate` is now
+  single `handle(action: ShieldAction, for: ApplicationToken,
+  completionHandler:)` (`buttonPressed` removed, `.primaryButtonPressed`
+  case kept). Bundle ID renamed to `com.axoi.niyyah`, app group
+  `group.com.axoi.niyyah`. Extension point identifiers fixed to `-service`
+  for both shield extensions (old `-extension` values now rejected —
+  validation error 90349 per Jun 2026 sources). AppDelegate/SceneDelegate
+  verified identical to Flutter 3.47.2 template (FlutterImplicitEngineDelegate
+  API correct). GH Actions workflow added; everything pushed (bc213b3), CI
+  loop pending user: repo public + `gh auth login`.
 
 ## Verification
 
