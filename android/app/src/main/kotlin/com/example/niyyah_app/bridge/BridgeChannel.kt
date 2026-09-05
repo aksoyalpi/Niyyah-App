@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
 import com.example.niyyah_app.blocker.BlockerService
@@ -36,6 +37,7 @@ class BridgeChannel(private val context: Context) : MethodChannel.MethodCallHand
                     result,
                 )
             }
+            "openBatterySettings" -> openBatterySettings(result)
             else -> result.notImplemented()
         }
     }
@@ -93,7 +95,29 @@ class BridgeChannel(private val context: Context) : MethodChannel.MethodCallHand
     private fun getPermissions(): Map<String, Boolean> = mapOf(
         "accessibility" to isAccessibilityEnabled(),
         "overlay" to Settings.canDrawOverlays(context),
+        "battery" to isIgnoringBatteryOptimizations(),
     )
+
+    private fun isIgnoringBatteryOptimizations(): Boolean {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        return pm.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    private fun openBatterySettings(result: MethodChannel.Result) {
+        val direct = Intent(
+            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+            Uri.parse("package:${context.packageName}"),
+        )
+        try {
+            context.startActivity(direct.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            result.success(true)
+        } catch (e: Exception) {
+            open(
+                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+                result,
+            )
+        }
+    }
 
     private fun isAccessibilityEnabled(): Boolean {
         val expected = ComponentName(context, BlockerService::class.java).flattenToString()

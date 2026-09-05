@@ -56,6 +56,15 @@ is on content, not design.
   (`assets/fonts`). Session/countdown logic lives in the service (Handler).
 - **Stats store**: native writes daily aggregates (minutes, items) to its own
   SharedPreferences; Flutter reads via bridge.
+- **Storage contract (native reads of `FlutterSharedPreferences`)**:
+  `flutter.blocklist` is a String — `JSON_LIST_PREFIX
+  "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu!"` + JSON array (as written by
+  shared_preferences_android 2.4.28; never read via getStringSet).
+  `flutter.session_minutes` is stored as Long (Dart setInt) — read via
+  `prefs.all[key] as? Number`. `display_mode`/`content_style` are plain
+  strings.
+- **CLI builds**: no system java; use
+  `JAVA_HOME=/opt/android-studio/jbr flutter build apk --debug`.
 - **Lints**: `flutter_lints` defaults. No comments unless needed.
 - **Content JSON schema**: `{id, arabic, translationEn, source}` where source
   is e.g. `"Quran 2:286"` or `"Riyad as-Salihin 42"`. Files:
@@ -82,8 +91,17 @@ is on content, not design.
 - M5 done: unit tests (content picker, settings controller, blocklist
   persistence, DayStats parsing), widget smoke test. `flutter analyze` and
   `flutter test` pass.
-- TODO (user/device): compile + run on device (needs Android Studio/JDK),
-  review religious texts before release, manual test protocol below.
+- M6 done (Sep 5, 2026): compiled + run on device, blocking verified
+  end-to-end. Fixed SettingsStore type mismatches that crashed the
+  accessibility service on every window event: `flutter.blocklist` is a
+  prefixed JSON string, `session_minutes` is stored as Long (see storage
+  contract below). Battery-optimization exemption added as third permission
+  row (manifest `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, bridge
+  `openBatterySettings` with direct dialog -> settings-list fallback). Root
+  lifecycle observer in app.dart invalidates stats + permissions providers on
+  resume, so dashboard/banner refresh after sessions without app restart.
+- TODO (user/device): review religious texts before release, manual test
+  protocol below.
 
 ## Verification
 
@@ -96,10 +114,11 @@ is on content, not design.
 
 1. Build & install: `flutter run` (needs Android Studio / JDK 17 on host).
 2. Open Niyyah → Block Apps tab → grant Accessibility + "Display over other
-   apps" via the banner.
+   apps" + battery exemption via the banner (banner refreshes on app resume).
 3. Toggle a switch on e.g. Instagram.
 4. Open Instagram → overlay must appear with 10s countdown on the button.
 5. Tap "I've read it" after countdown → overlay closes, app usable.
 6. Stay in Instagram → after session duration (default 15 min) overlay returns.
 7. Leave Instagram before expiry → reopen → overlay immediately (session reset).
-8. Dashboard shows minutes + items from overlay sessions.
+8. Dashboard shows minutes + items from overlay sessions (re-fetches on app
+   resume, no restart needed).

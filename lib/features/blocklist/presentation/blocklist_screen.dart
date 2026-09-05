@@ -13,28 +13,8 @@ class BlocklistScreen extends ConsumerStatefulWidget {
   ConsumerState<BlocklistScreen> createState() => _BlocklistScreenState();
 }
 
-class _BlocklistScreenState extends ConsumerState<BlocklistScreen>
-    with WidgetsBindingObserver {
+class _BlocklistScreenState extends ConsumerState<BlocklistScreen> {
   var _query = '';
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      ref.invalidate(permissionsProvider);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +122,7 @@ final class _PermissionBanner extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Niyyah needs two permissions to block apps:',
+              'Niyyah needs three permissions to block apps:',
               style: TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 12),
@@ -157,10 +137,11 @@ final class _PermissionBanner extends ConsumerWidget {
               label: 'Display over other apps (show the verse)',
               onTap: bridge.openOverlaySettings,
             ),
-            const SizedBox(height: 4),
-            const Text(
-              'Tip: exclude Niyyah from battery optimization so blocking keeps working.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            const SizedBox(height: 8),
+            _PermissionRow(
+              done: status.battery,
+              label: 'Battery optimization (run unrestricted)',
+              onTap: bridge.openBatterySettings,
             ),
           ],
         ),

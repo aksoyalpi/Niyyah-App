@@ -28,10 +28,15 @@ final class DayStats {
 final class PermissionStatus {
   final bool accessibility;
   final bool overlay;
+  final bool battery;
 
-  const PermissionStatus({required this.accessibility, required this.overlay});
+  const PermissionStatus({
+    required this.accessibility,
+    required this.overlay,
+    required this.battery,
+  });
 
-  bool get isComplete => accessibility && overlay;
+  bool get isComplete => accessibility && overlay && battery;
 }
 
 final class NativeBridge {
@@ -67,6 +72,7 @@ final class NativeBridge {
     return PermissionStatus(
       accessibility: result?['accessibility'] as bool? ?? false,
       overlay: result?['overlay'] as bool? ?? false,
+      battery: result?['battery'] as bool? ?? false,
     );
   }
 
@@ -75,6 +81,9 @@ final class NativeBridge {
 
   Future<void> openOverlaySettings() =>
       _channel.invokeMethod('openOverlaySettings');
+
+  Future<void> openBatterySettings() =>
+      _channel.invokeMethod('openBatterySettings');
 }
 
 final nativeBridgeProvider = Provider<NativeBridge>((ref) => NativeBridge());
