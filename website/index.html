@@ -19,8 +19,9 @@
     <div class="container nav-inner">
       <a class="brand" href="#">
         <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
-          <mask id="crescent-cut"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="32" r="21" fill="#000"/></mask>
-          <circle cx="30" cy="32" r="24" fill="#2F6B4F" mask="url(#crescent-cut)"/>
+          <mask id="bm-nav"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="32" r="22" fill="#000"/></mask>
+          <circle cx="27" cy="32" r="26" fill="#2F6B4F" mask="url(#bm-nav)"/>
+          <path d="M43 20l2.6 9.4L55 32l-9.4 2.6L43 44l-2.6-9.4L31 32l9.4-2.6z" fill="#2F6B4F"/>
         </svg>
         <span>Niyyah</span>
       </a>
@@ -34,9 +35,25 @@
 
   <main>
     <section class="hero">
+      <span class="hero-watermark" lang="ar" aria-hidden="true">نِيَّة</span>
+
+      <span class="hero-ornament orn-1" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </span>
+      <span class="hero-ornament orn-2" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>
+      </span>
+      <span class="hero-ornament orn-3" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>
+      </span>
+      <span class="hero-ornament orn-4" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </span>
+
       <div class="container hero-inner">
         <div class="hero-copy">
-          <h1>Open a blocked app.<br><span class="accent">Read a verse</span> instead.</h1>
+          <span class="hero-badge"><span class="hero-badge-dot"></span>Early access now open — Android</span>
+          <h1>Open a blocked app.<br><em class="serif-accent">Read a verse</em> instead.</h1>
           <p class="hero-sub">
             Niyyah adds a moment of intention between you and the apps that steal
             your focus. Instead of the feed, a Quran verse or hadith appears —
@@ -46,22 +63,31 @@
             <a class="btn" href="#signup">Get early access</a>
             <a class="btn btn-ghost" href="#how">See how it works</a>
           </div>
-          <p class="hero-meta">Free · Offline · No account needed · Android first</p>
+          <div class="hero-chips">
+            <span class="chip">Free</span>
+            <span class="chip">100% offline</span>
+            <span class="chip">No account</span>
+            <span class="chip">Android first</span>
+          </div>
         </div>
 
         <div class="hero-visual">
           <div class="phone">
             <div class="phone-screen">
-              <div class="phone-status"><span class="phone-camera"></span></div>
+              <div class="phone-status">
+                <span class="phone-time">9:41</span>
+                <span class="phone-island"></span>
+                <span class="phone-battery"></span>
+              </div>
               <div class="overlay">
                 <p class="overlay-source">Quran 2:186</p>
                 <p class="overlay-arabic" dir="rtl" lang="ar">وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ</p>
                 <p class="overlay-translation">…when My servants ask you about Me — indeed, I am near…</p>
                 <div class="overlay-actions">
-                  <button type="button" class="overlay-nav" tabindex="-1">Previous</button>
-                  <button type="button" class="overlay-nav" tabindex="-1">Next</button>
+                  <button type="button" class="overlay-nav" tabindex="-1">‹&nbsp; Previous</button>
+                  <button type="button" class="overlay-nav" tabindex="-1">Next &nbsp;›</button>
                 </div>
-                <button type="button" class="overlay-read" disabled>I've read it · 0:07</button>
+                <button type="button" class="overlay-read" disabled><span>I've read it</span><span class="overlay-count">0:07</span></button>
               </div>
             </div>
           </div>
@@ -72,21 +98,31 @@
 
     <section id="how" class="section">
       <div class="container">
-        <h2>How it works</h2>
-        <p class="section-sub">Three steps. No willpower settings to fiddle with.</p>
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps, no fiddling</h2>
+        <p class="section-sub">Niyyah watches only the apps you chose. Everything else stays untouched.</p>
         <div class="steps">
           <div class="card">
-            <div class="step-num">1</div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </div>
+            <span class="step-tag">Step 1</span>
             <h3>Choose what to block</h3>
             <p>Pick the apps that pull you in — Instagram, TikTok, YouTube. Niyyah watches for them, nothing else.</p>
           </div>
           <div class="card">
-            <div class="step-num">2</div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h13"/></svg>
+            </div>
+            <span class="step-tag">Step 2</span>
             <h3>Open the app, read first</h3>
             <p>A verse or hadith appears instantly. The confirm button unlocks after a 10-second read — no skipping.</p>
           </div>
           <div class="card">
-            <div class="step-num">3</div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 10v3.5l2 2"/><path d="M9.5 2.5h5"/></svg>
+            </div>
+            <span class="step-tag">Step 3</span>
             <h3>Confirm, then carry on</h3>
             <p>The app opens for the session you chose — 5 to 30 minutes. Leave early and the cycle starts fresh next time.</p>
           </div>
@@ -96,30 +132,49 @@
 
     <section id="features" class="section section-alt">
       <div class="container">
+        <span class="eyebrow">Features</span>
         <h2>Simple by design</h2>
         <p class="section-sub">Everything Niyyah does. Nothing it doesn't.</p>
         <div class="features">
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.4 5 8.3 4.5 6 4.5c-1 0-2 .1-3 .4V19c1-.3 2-.4 3-.4 2.3 0 4.4.5 6 2 1.6-1.5 3.7-2 6-2 1 0 2 .1 3 .4V4.9c-1-.3-2-.4-3-.4-2.3 0-4.4.5-6 2z"/><path d="M12 6.5v14.1"/></svg>
+            </div>
             <h3>100+ verses &amp; hadiths</h3>
             <p>Curated Quran verses and authentic hadiths — Arabic with English translation.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.6 16.4a5 5 0 0 1 6.4-.4"/><path d="M5 13a10.5 10.5 0 0 1 5.2-2.7"/><path d="M14 10.2a10.5 10.5 0 0 1 5 2.6"/><path d="M2 9a15.5 15.5 0 0 1 5.9-3.4"/><path d="M16.6 5.9A15.5 15.5 0 0 1 22 9"/><path d="M12 20h.01"/></svg>
+            </div>
             <h3>Fully offline</h3>
             <p>All content is bundled in the app. It works without a network, forever.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.6-7 10-4-1.4-7-5.4-7-10V6z"/><path d="M9.5 11.5l2 2 3.5-4"/></svg>
+            </div>
             <h3>No account, no tracking</h3>
             <p>Everything stays on your phone. No sign-up, no backend, no data collected.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 20v-6"/><path d="M12 20V9"/><path d="M17 20v-9"/><path d="M4 20h16"/></svg>
+            </div>
             <h3>Reading stats</h3>
             <p>Minutes read and texts shown today, plus a quiet 7-day overview.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h9"/><circle cx="17" cy="8" r="2.5"/><path d="M20 16h-9"/><circle cx="7" cy="16" r="2.5"/></svg>
+            </div>
             <h3>You set the pace</h3>
             <p>Quran only, hadith only, or mixed. Arabic only, English only, or both.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2-9.4L3 10"/></svg>
+            </div>
             <h3>No clever bypasses</h3>
             <p>No active sessions after a reboot. Every open begins with a fresh read.</p>
           </div>
@@ -128,21 +183,28 @@
     </section>
 
     <section id="signup" class="section">
-      <div class="container signup">
-        <h2>Be first in line</h2>
-        <p class="section-sub">
-          Niyyah for Android is in final testing. Leave your email for early access
-          and release updates. No spam, unsubscribe anytime.
-        </p>
+      <div class="container">
+        <div class="signup-panel">
+          <svg class="signup-watermark" viewBox="0 0 64 64" aria-hidden="true">
+            <mask id="wm-signup"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="32" r="22" fill="#000"/></mask>
+            <circle cx="27" cy="32" r="26" fill="#2F6B4F" mask="url(#wm-signup)"/>
+          </svg>
+          <span class="eyebrow">Early access</span>
+          <h2>Be first in line</h2>
+          <p class="section-sub">
+            Niyyah for Android is in final testing. Leave your email for early access
+            and release updates. No spam, unsubscribe anytime.
+          </p>
 
-        <!-- ▼▼ REPLACE this form with your MailerLite embedded form snippet (see README.md ▼▼ -->
-        <form class="signup-form" action="#" method="post">
-          <label class="visually-hidden" for="signup-email">Email address</label>
-          <input id="signup-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-          <button class="btn" type="submit">Notify me</button>
-        </form>
-        <p class="signup-note">Double opt-in · No spam · Unsubscribe anytime</p>
-        <!-- ▲▲ END MailerLite placeholder ▲▲ -->
+          <!-- ▼▼ REPLACE this form with your MailerLite embedded form snippet (see README.md ▼▼ -->
+          <form class="signup-form" action="#" method="post">
+            <label class="visually-hidden" for="signup-email">Email address</label>
+            <input id="signup-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+            <button class="btn" type="submit">Notify me</button>
+          </form>
+          <p class="signup-note">Double opt-in · No spam · Unsubscribe anytime</p>
+          <!-- ▲▲ END MailerLite placeholder ▲▲ -->
+        </div>
       </div>
     </section>
   </main>
@@ -151,17 +213,17 @@
     <div class="container footer-inner">
       <div class="brand brand-footer">
         <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
-          <mask id="crescent-cut-footer"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="32" r="21" fill="#000"/></mask>
-          <circle cx="30" cy="32" r="24" fill="#2F6B4F" mask="url(#crescent-cut-footer)"/>
+          <mask id="bm-footer"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="32" r="22" fill="#000"/></mask>
+          <circle cx="27" cy="32" r="26" fill="#2F6B4F" mask="url(#bm-footer)"/>
+          <path d="M43 20l2.6 9.4L55 32l-9.4 2.6L43 44l-2.6-9.4L31 32l9.4-2.6z" fill="#2F6B4F"/>
         </svg>
         <span>Niyyah</span>
       </div>
       <p class="footer-tag">Made with intention.</p>
       <nav class="footer-links">
-        <!-- TODO before public launch: add real Impressum + privacy policy pages (required in Germany) -->
-        <a href="#">Privacy</a>
-        <a href="#">Imprint</a>
-        <a href="mailto:hello@niyyah.example">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="imprint.html">Imprint</a>
+        <a href="mailto:alaksoftware@gmail.com">Contact</a>
       </nav>
       <p class="footer-copy">© 2026 Niyyah</p>
     </div>

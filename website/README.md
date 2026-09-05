@@ -8,10 +8,13 @@ signup and newsletter.
 ```
 website/
   index.html          # the whole page
+  privacy.html        # GDPR privacy policy (placeholders to fill)
+  imprint.html        # § 5 DDG imprint (placeholders to fill)
   styles.css          # palette copied from lib/core/theme/app_theme.dart
   assets/
     icon.svg          # app icon (green crescent)
-    fonts/Amiri-*.ttf # self-hosted, no external font CDN
+    fonts/Amiri-*.ttf # Arabic in the mockup (self-hosted)
+    fonts/Fraunces-*.woff2 # display serif for headings (600 + italic, latin subset)
 ```
 
 Design constants mirror the app: accent `#2F6B4F`, background `#FCFBF7`,
@@ -64,11 +67,18 @@ to 100 subscribers.
 CLI alternative: `npx wrangler pages deploy . --project-name=niyyah`
 (from inside `website/`).
 
+## Legal pages
+
+`privacy.html` (GDPR policy) and `imprint.html` (§ 5 DDG) exist but contain
+`[PLACEHOLDER]` blocks. Each file has an HTML comment at the top listing
+exactly what to fill in: your name, full postal address (no P.O. box — German
+law), city, and the "last updated" date. Contact email is already set to
+`alaksoftware@gmail.com`. The text is a draft, not legal advice — cross-check
+with a generator (eRecht24 etc.) or a lawyer before launch.
+
 ## Before public launch
 
-- [ ] Replace `mailto:hello@niyyah.example` in the footer with a real address.
-- [ ] Add Impressum + privacy policy (legally required in Germany) — footer
-      links are placeholders.
+- [ ] Fill the `[PLACEHOLDER]` blocks in `privacy.html` and `imprint.html`.
 - [ ] Swap the phone mockup for a real app screenshot (hero `.phone` block).
 - [ ] Add `og:image` (1200×630 PNG) for social sharing.
 - [ ] Review MailerLite list settings + confirmation email wording.
