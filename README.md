@@ -1,6 +1,10 @@
-# niyyah_app
+# Niyyah
 
-A new Flutter project.
+Blocker app: opening a blocked app shows a Quran verse or Hadith instead.
+
+## License
+
+GNU Affero General Public License v3.0 (AGPL-3.0) — see [LICENSE](LICENSE).
 
 ## Getting Started
 
